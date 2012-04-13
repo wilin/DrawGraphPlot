@@ -41,6 +41,9 @@ namespace UsageExample {
 	    Console.Write("Generiranje in dodajanje sproti: ");
 	    Console.WriteLine(konec - zacetek);
 
+	    // Some more testing text addition
+
+
 	    graphDisplay1.Invalidate();
 
 	}
