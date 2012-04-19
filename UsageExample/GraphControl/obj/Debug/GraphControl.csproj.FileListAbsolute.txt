@@ -5,3 +5,10 @@ C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\Praktikum\U
 C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\Praktikum\UsageExample\GraphControl\obj\Debug\GraphControl.csproj.GenerateResource.Cache
 C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\Praktikum\UsageExample\GraphControl\obj\Debug\GraphControl.dll
 C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\Praktikum\UsageExample\GraphControl\obj\Debug\GraphControl.pdb
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\obj\Debug\GraphControl.GraphDisplay.resources
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\obj\Debug\GraphControl.csproj.GenerateResource.Cache
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\obj\Debug\GraphControl.dll
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\obj\Debug\GraphControl.pdb
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\bin\Debug\GraphControl.dll
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\bin\Debug\GraphControl.pdb
