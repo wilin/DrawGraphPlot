@@ -17,9 +17,9 @@ namespace GraphControl {
 	public float maxDisplay = 1;
 
 	public static int Fvz = 44100;	    // Mogoce kasneje float?
-	public int maxFPS = 10;	    // 1-30, recimo
+	public int maxFPS = 30;	    // 1-30, recimo
 	public static float visibleSignal = (float)0.01;  // visibleSignal*Fvz = signal shown (is underSampling == 0)
-	public int underSampling = 0;	    // 0-xy -> every n-th sample shown.
+	public int underSampling = 1;	    // 1-xy -> every n-th sample shown. (has to be more than 1!)
 
 	public LinkedList<float> podatki = new LinkedList<float>();
 
@@ -127,6 +127,31 @@ namespace GraphControl {
 		}
 		else if (signalMode == 1) {
 		    // The FFT
+		    // This is NOT IMPLEMENTED YET
+		    // The code below is just a quick test
+
+		    float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)((Convert.ToInt32(visibleSignal * Fvz))/2));
+
+		    System.Console.WriteLine("tff " + step.ToString());
+		    float maxValue = dataToDisplay.Max();
+		    float minValue = dataToDisplay.Min();
+
+		    b = new SolidBrush(Color.Orange);
+		    e.Graphics.DrawString("1", new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
+		    e.Graphics.DrawString("-1", new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown - 15);
+		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown) / 2 - 8);
+		    e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
+
+		    b = new SolidBrush(Color.Ivory);
+		    float horizontalDraw = (float)horizontalnaLeft + 1;
+		    for (int i = 0; i < dataToDisplay.Length; i = i+2) {
+			e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown - 1, horizontalDraw, vertikalnaDown - dataToDisplay[i] * (vertikalnaDown) +2);
+			horizontalDraw = horizontalDraw + step;
+		    }
+
+		    b = new SolidBrush(Color.Orange);
+		    e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
+
 
 		}
 
@@ -182,13 +207,41 @@ namespace GraphControl {
 		int r = dataToDisplay.Length - 1;
 		while (currentNode != null && r>=0) {
 		    dataToDisplay[r] = currentNode.Value;
-		    currentNode = currentNode.Previous;
+		    int j = 0;
+		    while (currentNode != null && j < underSampling) {
+			currentNode = currentNode.Previous;
+			j++;
+		    }
 		    r--;
 		}
 
 	    }
 	    else if (signalMode == 1) {
 		// Prepare the FFT
+
+		// This is TESTING DATA. No FFT implemented yet.
+		// Prepare flatline
+		dataToDisplay = new float[(Convert.ToInt32(visibleSignal * Fvz))];
+		for (int i = 0; i < dataToDisplay.Length; i++) {
+		    dataToDisplay[i] = ((float)0.0);
+		}
+
+		LinkedListNode<float> currentNode = podatki.Last;
+		int r = dataToDisplay.Length - 1;
+		while (currentNode != null && r >= 0) {
+		    dataToDisplay[r] = currentNode.Value;
+		    int j = 0;
+		    while (currentNode != null && j < underSampling) {
+			currentNode = currentNode.Previous;
+			j++;
+		    }
+		    r--;
+		}
+		// Delete/repair/modify this.
+		for (int k = 0; k < dataToDisplay.Length-2; k = k + 2) {
+		    dataToDisplay[k] = Math.Abs((dataToDisplay[k] + dataToDisplay[k + 1]) / 2);
+		}
+
 
 	    }
 

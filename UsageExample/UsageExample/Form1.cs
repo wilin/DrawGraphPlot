@@ -97,5 +97,15 @@ namespace UsageExample {
 	private void button3_Click(object sender, EventArgs e) {
 	    fluffy.Suspend();
 	}
+
+	private void button5_Click(object sender, EventArgs e) {
+	    // Signal mode
+	    graphDisplay1.signalMode = 0;
+	}
+
+	private void button6_Click(object sender, EventArgs e) {
+	    // FFT view
+	    graphDisplay1.signalMode = 1;
+	}
     }
 }
