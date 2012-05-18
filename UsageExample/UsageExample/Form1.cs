@@ -13,6 +13,8 @@ namespace UsageExample {
     public partial class Form1 : Form {
 
 	Thread fluffy;
+	Color[] barve = {Color.Red, Color.Green, Color.Blue, Color.White, Color.Black,
+			    Color.Lime, Color.Yellow, Color.Orange, Color.Cyan };
 
 	public Form1() {
 	    InitializeComponent();
@@ -87,7 +89,12 @@ namespace UsageExample {
 	}
 
 	private void button2_Click(object sender, EventArgs e) {
-	    fluffy.Resume();
+	    try {
+		fluffy.Resume();
+	    }
+	    catch (Exception ns) {
+		System.Console.WriteLine("Thread not suspended");
+	    }
 	}
 
 	private void button4_Click(object sender, EventArgs e) {
@@ -100,12 +107,74 @@ namespace UsageExample {
 
 	private void button5_Click(object sender, EventArgs e) {
 	    // Signal mode
-	    graphDisplay1.signalMode = 0;
+	    graphDisplay1.setSignalSelect(0);
 	}
 
 	private void button6_Click(object sender, EventArgs e) {
 	    // FFT view
-	    graphDisplay1.signalMode = 1;
+	    graphDisplay1.setSignalSelect(1);
 	}
+
+	private void button7_Click(object sender, EventArgs e) {
+	    // Start recording mode
+	    graphDisplay1.setRecordMode();
+	}
+
+
+	private void button8_Click(object sender, EventArgs e) {
+	    // Start playback mode
+	    graphDisplay1.setPlaybackMode();
+	}
+
+	private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.BackColor = barve[comboBox1.SelectedIndex];
+	}
+
+	private void comboBox2_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.setColorSidePanel(barve[comboBox2.SelectedIndex]);
+	}
+
+	private void comboBox3_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.setColorBottomPanel(barve[comboBox3.SelectedIndex]);
+	}
+
+	private void comboBox4_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.setColorWaterMark(barve[comboBox4.SelectedIndex]);
+	}
+
+	private void comboBox5_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.setColorSideText(barve[comboBox5.SelectedIndex]);
+	}
+
+	private void comboBox6_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.setColorBottomText(barve[comboBox6.SelectedIndex]);
+	}
+
+	private void comboBox7_SelectedIndexChanged(object sender, EventArgs e) {
+	    graphDisplay1.setColorZeroLine(barve[comboBox7.SelectedIndex]);
+	}
+
+	private void groupBox1_Enter(object sender, EventArgs e) {
+
+	}
+
+	private void button9_Click(object sender, EventArgs e) {
+	    try {
+		byte[] bytes = System.IO.File.ReadAllBytes("c:/sample2.wav");
+		/*
+		for (int i = 44; i < bytes.Length; i++) {
+		    graphDisplay1.addData(bytes[i]);
+		}
+		*/
+		for (int i = 44; i < bytes.Length - 4; i = i + 4) {
+		    graphDisplay1.addData(BitConverter.ToInt16(bytes, i));
+		}
+	    }
+	    catch (Exception nope) {
+
+	    }
+	}
+
+
     }
 }

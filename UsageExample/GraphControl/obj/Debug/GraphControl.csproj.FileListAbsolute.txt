@@ -12,3 +12,4 @@ C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPl
 C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\obj\Debug\GraphControl.pdb
 C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\bin\Debug\GraphControl.dll
 C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\bin\Debug\GraphControl.pdb
+C:\Documents and Settings\N\My Documents\Visual Studio 2008\Projects\DrawGraphPlot\UsageExample\GraphControl\bin\Debug\fftwlib.dll
