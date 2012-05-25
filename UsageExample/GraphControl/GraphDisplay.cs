@@ -27,6 +27,10 @@ namespace GraphControl {
 	private static float visibleSignal = (float)0.01;  // visibleSignal*Fvz = signal shown. Also known as how much signal in seconds.
 	private int underSampling = 1;	    // 1-xy -> every n-th sample shown. (has to be more than 1!)
 	private int hardLimitSamples = (Fvz*600);   // 10 minutes of signal
+	private bool scalingEnabled = true;
+	private static int waitFramesToScale = 15;
+	private int frameCounter = waitFramesToScale;
+	private float previousMaxValue = (float)1.0;
 
 	private LinkedList<float> podatki = new LinkedList<float>();
 	private LinkedList<float> podatkiPlayback = new LinkedList<float>();
@@ -130,24 +134,70 @@ namespace GraphControl {
 		    float maxValue = dataToDisplay.Max();
 		    float minValue = dataToDisplay.Min();
 
-		    b = new SolidBrush(sideText);
-		    e.Graphics.DrawString("1", new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
-		    e.Graphics.DrawString("-1", new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown-15);
-		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown)/2-8);
-
 		    // Add print or draw min and max values.
 
 
-		    e.Graphics.DrawLine(new Pen(zeroLine), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
-
-		    b = new SolidBrush(waterMark);
+		    // e.Graphics.DrawLine(new Pen(zeroLine), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
 
 		    float horizontalDraw = (float) horizontalnaLeft+1;
 
-		    for (int i = 0; i < dataToDisplay.Length-1; i++) {
-			e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown / 2 + dataToDisplay[i] * (vertikalnaDown / 2), horizontalDraw + step, vertikalnaDown / 2 + dataToDisplay[i+1] * (vertikalnaDown / 2));
-			horizontalDraw = horizontalDraw + step;
-			//System.Console.WriteLine("oh");
+		    if (scalingEnabled == false) {
+			b = new SolidBrush(sideText);
+			e.Graphics.DrawString("1", new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
+			e.Graphics.DrawString("-1", new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown - 15);
+			e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown) / 2 - 8);
+			e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
+
+			b = new SolidBrush(waterMark);
+			Pen bP = new Pen(bottomText);
+
+			for (int i = 0; i < dataToDisplay.Length - 1; i++) {
+			    e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown / 2 + dataToDisplay[i] * (vertikalnaDown / 2), horizontalDraw + step, vertikalnaDown / 2 + dataToDisplay[i + 1] * (vertikalnaDown / 2));
+
+			    e.Graphics.DrawLine(bP, horizontalDraw, vertikalnaDown, horizontalDraw, vertikalnaDown + 10);
+
+			    horizontalDraw = horizontalDraw + step;
+			    //System.Console.WriteLine("oh");
+			}
+		    }
+		    else {
+			// Scaling enabled
+			float absMaxValue = Math.Abs(maxValue);
+			if (Math.Abs(minValue) > absMaxValue) {
+			    absMaxValue = Math.Abs(minValue);
+			}
+
+			if (absMaxValue > previousMaxValue) {
+			    previousMaxValue = absMaxValue;
+			    frameCounter = waitFramesToScale;
+			}
+			else {
+			    frameCounter--;
+			    if (frameCounter <= 0) {
+				previousMaxValue = absMaxValue;
+				frameCounter = waitFramesToScale;
+			    }
+			}
+
+			b = new SolidBrush(sideText);
+			e.Graphics.DrawString(String.Format("{0:.##}", previousMaxValue), new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
+			e.Graphics.DrawString("-" + String.Format("{0:.##}", previousMaxValue), new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown - 15);
+			e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown) / 2 - 8);
+			e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
+
+			b = new SolidBrush(waterMark);
+			Pen bP = new Pen(bottomText);
+
+			for (int i = 0; i < dataToDisplay.Length - 1; i++) {
+			    e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown / 2 + (dataToDisplay[i] / previousMaxValue) * (vertikalnaDown / 2), horizontalDraw + step, vertikalnaDown / 2 + (dataToDisplay[i + 1] / previousMaxValue) * (vertikalnaDown / 2));
+
+			    e.Graphics.DrawLine(bP, horizontalDraw, vertikalnaDown, horizontalDraw, vertikalnaDown + 10);
+
+			    horizontalDraw = horizontalDraw + step;
+			    //System.Console.WriteLine("oh");
+			}
+
+
 		    }
 
 		    b = new SolidBrush(zeroLine); 
@@ -158,7 +208,7 @@ namespace GraphControl {
 		else if (signalMode == 1) {
 		    // The FFT
 
-		    float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)((Convert.ToInt32(visibleSignal * Fvz))/2));
+		    float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)((Convert.ToInt32(visibleSignal * Fvz))));
 
 		    //float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)(((Fvz)) / 2));
 
@@ -167,7 +217,7 @@ namespace GraphControl {
 		    float minValue = dataToDisplay.Min();
 
 		    b = new SolidBrush(sideText);
-		    e.Graphics.DrawString(String.Format("{0:0.#}", maxValue), new Font(FontFamily.GenericSansSerif, 7), b, 0, 0);
+		    e.Graphics.DrawString(String.Format("{0:.##}", maxValue), new Font(FontFamily.GenericSansSerif, 7), b, 0, 0);
 		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 7), b, 0, vertikalnaDown - 15);
 
 		    e.Graphics.DrawString("", new Font(FontFamily.GenericSansSerif, 7), b, 0, vertikalnaDown - 15);
@@ -180,7 +230,14 @@ namespace GraphControl {
 		    b = new SolidBrush(bottomText);
 		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 7), b, horizontalnaLeft, vertikalnaDown);
 
-		    e.Graphics.DrawString(Convert.ToString(Fvz / 2), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft+horizontalnaRight)/2, vertikalnaDown);
+		    e.Graphics.DrawString(Convert.ToString(Fvz * 0.75), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft + horizontalnaRight) * (float)0.75, vertikalnaDown);
+		    e.Graphics.DrawLine(new Pen(b), (horizontalnaLeft + horizontalnaRight) * (float)0.75, vertikalnaDown, (horizontalnaLeft + horizontalnaRight) * (float)0.75, vertikalnaDown + 10);
+
+		    e.Graphics.DrawString(Convert.ToString(Fvz / 4), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft+horizontalnaRight)/2, vertikalnaDown);
+		    e.Graphics.DrawLine(new Pen(b), (horizontalnaLeft + horizontalnaRight) / 2, vertikalnaDown, (horizontalnaLeft + horizontalnaRight) / 2, vertikalnaDown + 10);
+
+		    e.Graphics.DrawString(Convert.ToString(Fvz / 8), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft + horizontalnaRight) / 4, vertikalnaDown);
+		    e.Graphics.DrawLine(new Pen(b), (horizontalnaLeft + horizontalnaRight) / 4, vertikalnaDown, (horizontalnaLeft + horizontalnaRight) / 4, vertikalnaDown + 10);
 
 
 		    b = new SolidBrush(waterMark);
@@ -221,26 +278,53 @@ namespace GraphControl {
 		    float maxValue = dataToDisplay.Max();
 		    float minValue = dataToDisplay.Min();
 
-		    b = new SolidBrush(sideText);
-		    e.Graphics.DrawString("1", new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
-		    e.Graphics.DrawString("-1", new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown - 15);
-		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown) / 2 - 8);
-
 		    // Add print or draw min and max values.
 
-
-		    e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
-
-		    b = new SolidBrush(waterMark);
-
 		    float horizontalDraw = (float)horizontalnaLeft + 1;
+		    if (scalingEnabled == false) {
 
-		    for (int i = 0; i < dataToDisplay.Length - 1; i++) {
-			e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown / 2 + dataToDisplay[i] * (vertikalnaDown / 2), horizontalDraw + step, vertikalnaDown / 2 + dataToDisplay[i + 1] * (vertikalnaDown / 2));
-			horizontalDraw = horizontalDraw + step;
-			//System.Console.WriteLine("oh");
+			b = new SolidBrush(sideText);
+			e.Graphics.DrawString("1", new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
+			e.Graphics.DrawString("-1", new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown - 15);
+			e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown) / 2 - 8);
+			e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
+
+			b = new SolidBrush(waterMark);
+			Pen bP = new Pen(bottomText);
+
+			for (int i = 0; i < dataToDisplay.Length - 1; i++) {
+			    e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown / 2 + dataToDisplay[i] * (vertikalnaDown / 2), horizontalDraw + step, vertikalnaDown / 2 + dataToDisplay[i + 1] * (vertikalnaDown / 2));
+
+			    e.Graphics.DrawLine(bP, horizontalDraw, vertikalnaDown, horizontalDraw, vertikalnaDown + 10);
+
+			    horizontalDraw = horizontalDraw + step;
+			    //System.Console.WriteLine("oh");
+			}
 		    }
+		    else {
+			// Scaling enabled
+			float absMaxValue = Math.Abs(maxValue);
+			if (Math.Abs(minValue) > absMaxValue) {
+			    absMaxValue = Math.Abs(minValue);
+			}
+			b = new SolidBrush(sideText);
+			e.Graphics.DrawString(String.Format("{0:.##}", absMaxValue), new Font(FontFamily.GenericSansSerif, 8), b, 0, 0);
+			e.Graphics.DrawString("-" + String.Format("{0:.##}", absMaxValue), new Font(FontFamily.GenericSansSerif, 8), b, 0, vertikalnaDown - 15);
+			e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 8), b, 0, (vertikalnaDown) / 2 - 8);
+			e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
 
+			b = new SolidBrush(waterMark);
+			Pen bP = new Pen(bottomText);
+
+			for (int i = 0; i < dataToDisplay.Length - 1; i++) {
+			    e.Graphics.DrawLine(new Pen(b), horizontalDraw, vertikalnaDown / 2 + (dataToDisplay[i] / absMaxValue) * (vertikalnaDown / 2), horizontalDraw + step, vertikalnaDown / 2 + (dataToDisplay[i+1] / absMaxValue) * (vertikalnaDown / 2));
+
+			    e.Graphics.DrawLine(bP, horizontalDraw, vertikalnaDown, horizontalDraw, vertikalnaDown + 10);
+
+			    horizontalDraw = horizontalDraw + step;
+			    //System.Console.WriteLine("oh");
+			}
+		    }
 		    b = new SolidBrush(zeroLine);
 		    e.Graphics.DrawLine(new Pen(b), horizontalnaLeft + 1, vertikalnaDown / 2, horizontalnaRight - 1, vertikalnaDown / 2);
 
@@ -249,7 +333,7 @@ namespace GraphControl {
 		else {
 		    // FFT
 
-		    float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)((Convert.ToInt32(visibleSignal * Fvz)) / 2));
+		    float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)((Convert.ToInt32(visibleSignal * Fvz))));
 
 		    //float step = (float)(Convert.ToDouble(horizontalnaRight - horizontalnaLeft - 2) / (float)(((Fvz)) / 2));
 
@@ -258,7 +342,7 @@ namespace GraphControl {
 		    float minValue = dataToDisplay.Min();
 
 		    b = new SolidBrush(sideText);
-		    e.Graphics.DrawString(String.Format("{0:0.#}", maxValue), new Font(FontFamily.GenericSansSerif, 7), b, 0, 0);
+		    e.Graphics.DrawString(String.Format("{0:.##}", maxValue), new Font(FontFamily.GenericSansSerif, 7), b, 0, 0);
 		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 7), b, 0, vertikalnaDown - 15);
 
 		    e.Graphics.DrawString("", new Font(FontFamily.GenericSansSerif, 7), b, 0, vertikalnaDown - 15);
@@ -270,7 +354,14 @@ namespace GraphControl {
 		    b = new SolidBrush(bottomText);
 		    e.Graphics.DrawString("0", new Font(FontFamily.GenericSansSerif, 7), b, horizontalnaLeft, vertikalnaDown);
 
-		    e.Graphics.DrawString(Convert.ToString(Fvz / 2), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft + horizontalnaRight) / 2, vertikalnaDown);
+		    e.Graphics.DrawString(Convert.ToString(Fvz * 0.75), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft + horizontalnaRight) * (float)0.75, vertikalnaDown);
+		    e.Graphics.DrawLine(new Pen(b), (horizontalnaLeft + horizontalnaRight) * (float)0.75, vertikalnaDown, (horizontalnaLeft + horizontalnaRight) * (float)0.75, vertikalnaDown + 10);
+
+		    e.Graphics.DrawString(Convert.ToString(Fvz / 4), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft + horizontalnaRight) / 2, vertikalnaDown);
+		    e.Graphics.DrawLine(new Pen(b), (horizontalnaLeft + horizontalnaRight) / 2, vertikalnaDown, (horizontalnaLeft + horizontalnaRight) / 2, vertikalnaDown + 10);
+
+		    e.Graphics.DrawString(Convert.ToString(Fvz / 8), new Font(FontFamily.GenericSansSerif, 7), b, (horizontalnaLeft + horizontalnaRight) / 4, vertikalnaDown);
+		    e.Graphics.DrawLine(new Pen(b), (horizontalnaLeft + horizontalnaRight) / 4, vertikalnaDown, (horizontalnaLeft + horizontalnaRight) / 4, vertikalnaDown + 10);
 
 
 		    b = new SolidBrush(waterMark);
@@ -296,6 +387,7 @@ namespace GraphControl {
 
 
 	    b.Dispose();
+	    startTimer();
 	}
 
 	public void addData(List<float> data){
@@ -357,13 +449,16 @@ namespace GraphControl {
 	}
 
 	private void prepareDataToDisplay(object source, ElapsedEventArgs e) {
+	    stopTimer();
+	    int displaySize = (Convert.ToInt32(visibleSignal * Fvz)); // In case we modify signal length while preparing
+
 	    if (displayMode == 0) {
 		// Recording mode
 		if (signalMode == 0) {
 		    // Prepare the Actual signal
 
 		    // Prepare flatline
-		    dataToDisplay = new float[(Convert.ToInt32(visibleSignal * Fvz))];
+		    dataToDisplay = new float[displaySize];
 		    for (int i = 0; i < dataToDisplay.Length; i++) {
 			dataToDisplay[i] = ((float)0.0);
 		    }
@@ -384,9 +479,8 @@ namespace GraphControl {
 		else if (signalMode == 1) {
 		    // Prepare the FFT
 
-		    // This is TESTING DATA. No FFT implemented yet.
 		    // Prepare flatline
-		    dataToDisplay = new float[(Convert.ToInt32(visibleSignal * Fvz))];
+		    dataToDisplay = new float[displaySize];
 		    for (int i = 0; i < dataToDisplay.Length; i++) {
 			dataToDisplay[i] = ((float)0.0);
 		    }
@@ -414,32 +508,36 @@ namespace GraphControl {
 			catch (Exception grr) {
 			}
 		    }
-		    pin = fftwf.malloc((Convert.ToInt32(visibleSignal * Fvz)) * 8);	    // Float needs more than int.
-		    pout = fftwf.malloc((Convert.ToInt32(visibleSignal * Fvz)) * 8);
-		    fftDataIn = new float[(Convert.ToInt32(visibleSignal * Fvz)) * 2];
-		    fftDataOut = new float[(Convert.ToInt32(visibleSignal * Fvz)) * 2];
+		    pin = fftwf.malloc(displaySize * 8);	    // Float needs more than int.
+		    pout = fftwf.malloc(displaySize * 8);
+		    fftDataIn = new float[displaySize * 2];	    // fftw_complex
+		    fftDataOut = new float[displaySize * 2];
 		    hin = GCHandle.Alloc(fftDataIn, GCHandleType.Pinned);
 		    hout = GCHandle.Alloc(fftDataOut, GCHandleType.Pinned);
 
-		    for (int i = 0; i < (Convert.ToInt32(visibleSignal * Fvz)); i++) {
-			fftDataIn[i] = dataToDisplay[i];
-			fftDataOut[i] = dataToDisplay[i];
-			fftDataIn[i + (Convert.ToInt32(visibleSignal * Fvz))] = dataToDisplay[i];
-			fftDataOut[i + (Convert.ToInt32(visibleSignal * Fvz))] = dataToDisplay[i];
+		    for (int i = 0; i < displaySize-1; i++) {
+			fftDataIn[i*2] = dataToDisplay[i];
+			fftDataOut[i*2] = dataToDisplay[i];
+			fftDataIn[i*2 + 1] = 0;
+			fftDataOut[i*2 + 1] = 0;
 		    }
 
-		    Marshal.Copy(fftDataIn, 0, pin, (Convert.ToInt32(visibleSignal * Fvz)) * 2);
-		    Marshal.Copy(fftDataOut, 0, pout, (Convert.ToInt32(visibleSignal * Fvz)) * 2);
+		    Marshal.Copy(fftDataIn, 0, pin, displaySize * 2);
+		    Marshal.Copy(fftDataOut, 0, pout, displaySize * 2);
 
 		    try {
-			fplan1 = fftwf.dft_1d((Convert.ToInt32(visibleSignal * Fvz)), pin, pout, fftw_direction.Forward, fftw_flags.Estimate);
+			fplan1 = fftwf.dft_1d(displaySize, pin, pout, fftw_direction.Forward, fftw_flags.Estimate);
 
 			fftwf.execute(fplan1);
 
-			Marshal.Copy(pout, fftDataOut, 0, (Convert.ToInt32(visibleSignal * Fvz)) * 2);
+			Marshal.Copy(pout, fftDataOut, 0, displaySize * 2);
 
-			for (int i = 0; i < (Convert.ToInt32(visibleSignal * Fvz)); i++) {
-			    dataToDisplay[i] = Math.Abs(fftDataOut[i + 1]);
+			// The DC component is... not here
+			//System.Console.WriteLine(Convert.ToString(Math.Abs(fftDataOut[0]) + Math.Abs(fftDataOut[1])));
+
+			for (int i = 0; i < displaySize / 2; i++) {
+			    dataToDisplay[i*2] = Math.Abs(fftDataOut[i * 2]) + Math.Abs(fftDataOut[i * 2 + 1]);
+			    dataToDisplay[i*2+1] = Math.Abs(fftDataOut[i * 2]) + Math.Abs(fftDataOut[i * 2 + 1]);
 			}
 		    }
 		    catch (Exception thisSometimesFails) {
@@ -473,13 +571,13 @@ namespace GraphControl {
 		    // Raw signal
 
 		    // Prepare flatline
-		    dataToDisplay = new float[(Convert.ToInt32(visibleSignal * Fvz))];
+		    dataToDisplay = new float[displaySize];
 		    for (int i = 0; i < dataToDisplay.Length; i++) {
 			dataToDisplay[i] = ((float)0.0);
 		    }
 
 		    int barValue = hScrollBar1.Value;
-		    int offsetFromLast = ((hScrollBar1.Maximum - barValue) * (Convert.ToInt32(visibleSignal * Fvz)))/100;
+		    int offsetFromLast = ((hScrollBar1.Maximum - barValue) * displaySize/100);
 		    LinkedListNode<float> currentNode = podatkiPlayback.Last;
 		    while (currentNode != null && offsetFromLast > 0) {
 			currentNode = currentNode.Previous;
@@ -501,13 +599,13 @@ namespace GraphControl {
 		else {
 		    // FFT
 		    // Prepare flatline
-		    dataToDisplay = new float[(Convert.ToInt32(visibleSignal * Fvz))];
+		    dataToDisplay = new float[displaySize];
 		    for (int i = 0; i < dataToDisplay.Length; i++) {
 			dataToDisplay[i] = ((float)0.0);
 		    }
 
 		    int barValue = hScrollBar1.Value;
-		    int offsetFromLast = ((hScrollBar1.Maximum - barValue) * (Convert.ToInt32(visibleSignal * Fvz))) / 100;
+		    int offsetFromLast = ((hScrollBar1.Maximum - barValue) * displaySize / 100);
 		    LinkedListNode<float> currentNode = podatkiPlayback.Last;
 		    while (currentNode != null && offsetFromLast > 0) {
 			currentNode = currentNode.Previous;
@@ -534,32 +632,33 @@ namespace GraphControl {
 			catch (Exception gr) {
 			}
 		    }
-		    pin = fftwf.malloc((Convert.ToInt32(visibleSignal * Fvz)) * 8);	    // Float needs more than int.
-		    pout = fftwf.malloc((Convert.ToInt32(visibleSignal * Fvz)) * 8);
-		    fftDataIn = new float[(Convert.ToInt32(visibleSignal * Fvz)) * 2];
-		    fftDataOut = new float[(Convert.ToInt32(visibleSignal * Fvz)) * 2];
+		    pin = fftwf.malloc(displaySize * 8);	    // Float needs more than int.
+		    pout = fftwf.malloc(displaySize * 8);
+		    fftDataIn = new float[displaySize * 2];
+		    fftDataOut = new float[displaySize * 2];
 		    hin = GCHandle.Alloc(fftDataIn, GCHandleType.Pinned);
 		    hout = GCHandle.Alloc(fftDataOut, GCHandleType.Pinned);
 
-		    for (int i = 0; i < (Convert.ToInt32(visibleSignal * Fvz)); i++) {
-			fftDataIn[i] = dataToDisplay[i];
-			fftDataOut[i] = dataToDisplay[i];
-			fftDataIn[i + (Convert.ToInt32(visibleSignal * Fvz))] = dataToDisplay[i];
-			fftDataOut[i + (Convert.ToInt32(visibleSignal * Fvz))] = dataToDisplay[i];
+		    for (int i = 0; i < displaySize - 1; i++) {
+			fftDataIn[i * 2] = dataToDisplay[i];
+			fftDataOut[i * 2] = dataToDisplay[i];
+			fftDataIn[i * 2 + 1] = 0;
+			fftDataOut[i * 2 + 1] = 0;
 		    }
 
-		    Marshal.Copy(fftDataIn, 0, pin, (Convert.ToInt32(visibleSignal * Fvz)) * 2);
-		    Marshal.Copy(fftDataOut, 0, pout, (Convert.ToInt32(visibleSignal * Fvz)) * 2);
+		    Marshal.Copy(fftDataIn, 0, pin, displaySize * 2);
+		    Marshal.Copy(fftDataOut, 0, pout, displaySize * 2);
 
 		    try {
-			fplan1 = fftwf.dft_1d((Convert.ToInt32(visibleSignal * Fvz)), pin, pout, fftw_direction.Forward, fftw_flags.Estimate);
+			fplan1 = fftwf.dft_1d(displaySize, pin, pout, fftw_direction.Forward, fftw_flags.Estimate);
 
 			fftwf.execute(fplan1);
 
-			Marshal.Copy(pout, fftDataOut, 0, (Convert.ToInt32(visibleSignal * Fvz)) * 2);
-			
-			for (int i = 0; i < (Convert.ToInt32(visibleSignal * Fvz)); i++) {
-			    dataToDisplay[i] = Math.Abs(fftDataOut[i + 1]);
+			Marshal.Copy(pout, fftDataOut, 0, displaySize * 2);
+
+			for (int i = 0; i < displaySize / 2; i++) {
+			    dataToDisplay[i * 2] = Math.Abs(fftDataOut[i * 2]) + Math.Abs(fftDataOut[i * 2 + 1]);
+			    dataToDisplay[i * 2 + 1] = Math.Abs(fftDataOut[i * 2]) + Math.Abs(fftDataOut[i * 2 + 1]);
 			}
 		    }
 		    catch (Exception thisSometimesFailsToo) {
@@ -619,7 +718,7 @@ namespace GraphControl {
 	}
 
 	public void setVisibleSignal(float portion) {
-	    if (portion > (float)0.0) {
+	    if (portion >= (float)0.01) {
 		visibleSignal = portion;
 	    }
 	}
@@ -695,5 +794,22 @@ namespace GraphControl {
 	public Color getColorZeroLine() {
 	    return zeroLine;
 	}
+
+	public void setScaling(bool value){
+	    scalingEnabled = value;
+	}
+	public bool getScaling() {
+	    return scalingEnabled;
+	}
+
+	public void setWaitFramesToScale(int value) {
+	    if (value > 0) {
+		waitFramesToScale = value;
+	    }
+	}
+	public int getWaitFramesToScale(int value) {
+	    return waitFramesToScale;
+	}
+
     }
 }

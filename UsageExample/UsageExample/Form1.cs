@@ -160,13 +160,13 @@ namespace UsageExample {
 
 	private void button9_Click(object sender, EventArgs e) {
 	    try {
-		byte[] bytes = System.IO.File.ReadAllBytes("c:/sample2.wav");
+		byte[] bytes = System.IO.File.ReadAllBytes("c:/sample2.wav");	// Mono!
 		/*
 		for (int i = 44; i < bytes.Length; i++) {
 		    graphDisplay1.addData(bytes[i]);
 		}
 		*/
-		for (int i = 44; i < bytes.Length - 4; i = i + 4) {
+		for (int i = 44; i < bytes.Length - 2; i = i + 2) {	    // Int16 is 2 bytes :p
 		    graphDisplay1.addData(BitConverter.ToInt16(bytes, i));
 		}
 	    }
@@ -174,6 +174,26 @@ namespace UsageExample {
 
 	    }
 	}
+
+	private void button10_Click(object sender, EventArgs e) {
+	    // Increase visible portion
+	    graphDisplay1.setVisibleSignal(graphDisplay1.getVisibleSignal() + (float)0.001);
+	}
+
+	private void button11_Click(object sender, EventArgs e) {
+	    // Decrease visible portion
+	    graphDisplay1.setVisibleSignal(graphDisplay1.getVisibleSignal() - (float)0.001);
+	}
+
+	private void button12_Click(object sender, EventArgs e) {
+	    // Enable scaling
+	    graphDisplay1.setScaling(true);
+	}
+
+	private void button13_Click(object sender, EventArgs e) {
+	    graphDisplay1.setScaling(false);
+	}
+
 
 
     }
