@@ -53,7 +53,7 @@ namespace GraphControl {
 	// So many colors.
 	private Color sidePanel = Color.Honeydew;
 	private Color bottomPanel = Color.Gray;
-	private Color waterMark = Color.HotPink;
+	private Color waterMark = Color.LightGreen;
 	private Color sideText = Color.Orange;
 	private Color bottomText = Color.OrangeRed;
 	private Color zeroLine = Color.Orange;
@@ -174,7 +174,9 @@ namespace GraphControl {
 			else {
 			    frameCounter--;
 			    if (frameCounter <= 0) {
-				previousMaxValue = absMaxValue;
+				if (absMaxValue > 0.0) {
+				    previousMaxValue = absMaxValue;
+				}
 				frameCounter = waitFramesToScale;
 			    }
 			}

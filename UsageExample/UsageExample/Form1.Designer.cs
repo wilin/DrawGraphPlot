@@ -48,11 +48,11 @@
 	    this.label1 = new System.Windows.Forms.Label();
 	    this.button9 = new System.Windows.Forms.Button();
 	    this.groupBox2 = new System.Windows.Forms.GroupBox();
-	    this.button10 = new System.Windows.Forms.Button();
-	    this.button11 = new System.Windows.Forms.Button();
-	    this.graphDisplay1 = new GraphControl.GraphDisplay();
-	    this.button12 = new System.Windows.Forms.Button();
 	    this.button13 = new System.Windows.Forms.Button();
+	    this.button12 = new System.Windows.Forms.Button();
+	    this.button11 = new System.Windows.Forms.Button();
+	    this.button10 = new System.Windows.Forms.Button();
+	    this.graphDisplay1 = new GraphControl.GraphDisplay();
 	    this.groupBox1.SuspendLayout();
 	    this.groupBox2.SuspendLayout();
 	    this.SuspendLayout();
@@ -387,35 +387,15 @@
 	    this.groupBox2.TabStop = false;
 	    this.groupBox2.Text = "Extra testing";
 	    // 
-	    // button10
+	    // button13
 	    // 
-	    this.button10.Location = new System.Drawing.Point(6, 19);
-	    this.button10.Name = "button10";
-	    this.button10.Size = new System.Drawing.Size(149, 23);
-	    this.button10.TabIndex = 0;
-	    this.button10.Text = "Increase visible portion";
-	    this.button10.UseVisualStyleBackColor = true;
-	    this.button10.Click += new System.EventHandler(this.button10_Click);
-	    // 
-	    // button11
-	    // 
-	    this.button11.Location = new System.Drawing.Point(6, 56);
-	    this.button11.Name = "button11";
-	    this.button11.Size = new System.Drawing.Size(149, 23);
-	    this.button11.TabIndex = 1;
-	    this.button11.Text = "Decrease visible portion";
-	    this.button11.UseVisualStyleBackColor = true;
-	    this.button11.Click += new System.EventHandler(this.button11_Click);
-	    // 
-	    // graphDisplay1
-	    // 
-	    this.graphDisplay1.BackColor = System.Drawing.SystemColors.MenuHighlight;
-	    this.graphDisplay1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-	    this.graphDisplay1.Location = new System.Drawing.Point(12, 12);
-	    this.graphDisplay1.MinimumSize = new System.Drawing.Size(152, 62);
-	    this.graphDisplay1.Name = "graphDisplay1";
-	    this.graphDisplay1.Size = new System.Drawing.Size(302, 202);
-	    this.graphDisplay1.TabIndex = 0;
+	    this.button13.Location = new System.Drawing.Point(7, 136);
+	    this.button13.Name = "button13";
+	    this.button13.Size = new System.Drawing.Size(148, 23);
+	    this.button13.TabIndex = 3;
+	    this.button13.Text = "Disable scaling";
+	    this.button13.UseVisualStyleBackColor = true;
+	    this.button13.Click += new System.EventHandler(this.button13_Click);
 	    // 
 	    // button12
 	    // 
@@ -427,15 +407,35 @@
 	    this.button12.UseVisualStyleBackColor = true;
 	    this.button12.Click += new System.EventHandler(this.button12_Click);
 	    // 
-	    // button13
+	    // button11
 	    // 
-	    this.button13.Location = new System.Drawing.Point(7, 136);
-	    this.button13.Name = "button13";
-	    this.button13.Size = new System.Drawing.Size(148, 23);
-	    this.button13.TabIndex = 3;
-	    this.button13.Text = "Disable scaling";
-	    this.button13.UseVisualStyleBackColor = true;
-	    this.button13.Click += new System.EventHandler(this.button13_Click);
+	    this.button11.Location = new System.Drawing.Point(6, 56);
+	    this.button11.Name = "button11";
+	    this.button11.Size = new System.Drawing.Size(149, 23);
+	    this.button11.TabIndex = 1;
+	    this.button11.Text = "Decrease visible portion";
+	    this.button11.UseVisualStyleBackColor = true;
+	    this.button11.Click += new System.EventHandler(this.button11_Click);
+	    // 
+	    // button10
+	    // 
+	    this.button10.Location = new System.Drawing.Point(6, 19);
+	    this.button10.Name = "button10";
+	    this.button10.Size = new System.Drawing.Size(149, 23);
+	    this.button10.TabIndex = 0;
+	    this.button10.Text = "Increase visible portion";
+	    this.button10.UseVisualStyleBackColor = true;
+	    this.button10.Click += new System.EventHandler(this.button10_Click);
+	    // 
+	    // graphDisplay1
+	    // 
+	    this.graphDisplay1.BackColor = System.Drawing.SystemColors.MenuHighlight;
+	    this.graphDisplay1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+	    this.graphDisplay1.Location = new System.Drawing.Point(12, 12);
+	    this.graphDisplay1.MinimumSize = new System.Drawing.Size(152, 62);
+	    this.graphDisplay1.Name = "graphDisplay1";
+	    this.graphDisplay1.Size = new System.Drawing.Size(302, 202);
+	    this.graphDisplay1.TabIndex = 0;
 	    // 
 	    // Form1
 	    // 
